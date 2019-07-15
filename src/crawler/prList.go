@@ -58,61 +58,6 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 	var prForPage []common.PullRequestItem
 
 	c := colly.NewCollector()
-
-	/*
-		<a class="issue-link js-issue-link"
-		   data-error-text="Failed to load issue title"
-		   data-id="467063436"
-		   data-permission-text="Issue title is private"
-		   data-url="https://github.com/kubernetes/kubernetes/issues/80053"
-		   data-hovercard-type="pull_request"
-		   data-hovercard-url="/kubernetes/kubernetes/pull/80053/hovercard"
-		   href="https://github.com/kubernetes/kubernetes/pull/80053">
-		   #80053
-		</a>
-	*/
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-
-		href := e.Attr("href")
-		if strings.Contains(href, "https://github.com/kubernetes/kubernetes/pull") {
-			//fmt.Println(href)   // https://github.com/kubernetes/kubernetes/pull/80053
-			//fmt.Println(e.Name) // a
-			//fmt.Println(e.Text) // #80053
-			//fmt.Println(e.Attr("class"))
-
-			pr := common.PullRequestItem{
-				URL: href,
-			}
-
-			prForPage = append(prForPage, pr)
-		}
-
-		//e.Request.Visit(e.Attr("href"))
-		//fmt.Println(e.Name)
-		//fmt.Println(e.Text)
-		//fmt.Println(e.Attr("ria-label"))
-
-		//fmt.Print(e)
-	})
-
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL)
-	})
-
-	c.OnError(func(_ *colly.Response, e error) {
-		fmt.Println("Something is wrong: ", e)
-	})
-
-	c.Visit(targetPage)
-
-	return prForPage
-}
-
-func CrawlPrListFromPageExperiment(targetPage string) []common.PullRequestItem {
-
-	var prForPage []common.PullRequestItem
-
-	c := colly.NewCollector()
 	c.OnHTML("div[class=table-list-cell]", func(e *colly.HTMLElement) { // 选择器另外的写法".table-list-cell"
 		link, exist := e.DOM.Find("a.issue-link").Attr("href")
 		if !exist {

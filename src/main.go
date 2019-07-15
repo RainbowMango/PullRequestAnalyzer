@@ -4,6 +4,7 @@ import (
 	"common"
 	"crawler"
 	"fmt"
+	"time"
 )
 
 var prs []common.PullRequestItem
@@ -19,16 +20,45 @@ const (
 
 func main() {
 
-	// 先获取第一页的PR列表
-	prList := crawler.CrawlPrListFromPage(KubernetesMasterCommitPage)
-	prs = append(prs, prList...)
+	// 获取指定日期区间的PR数据, [startDate, endDate)
+	startDate := time.Date(2019, time.July, 8, 0, 0, 0, 0, time.UTC)
+	endDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
 
-	// 遍历PR,获取PR属性
-	for index, pr := range prs {
-		prWithAtrribute := crawler.GetPRLables(pr.URL)
-		prs[index].Labels = append(prs[index].Labels, prWithAtrribute.Labels...)
-		prs[index].Kind = prWithAtrribute.Kind
-		prs[index].MergeTime = prWithAtrribute.MergeTime
+	// 循环获取数据
+	nexPage := KubernetesMasterCommitPage
+	pageIndex := 0
+	shouldStop := false
+	for !shouldStop{
+		fmt.Printf("Get PR from page : %s, index: %d\n", nexPage, pageIndex)
+		prList := crawler.CrawlPrListFromPage(nexPage) // 此时pr拥有 pr.URL, pr.MergeTime
+
+		// 向本页中获取的Pr 列表中填充数据
+		for index, pr := range prList {
+			// 如果PR合入时间早于指定时间，则退出循环
+			if pr.MergeTime.Before(startDate){
+				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.String(), startDate.String())
+				shouldStop = true
+				break
+			}
+
+			// 因为是从前往后查找，前面的可能不在统计区间内，所以前面的只需要忽略，不需要退出
+			if pr.MergeTime.After(endDate) {
+				continue
+			}
+
+			prList[index].MergeTime = pr.MergeTime
+
+			// 获取PR label 和kind
+			prWithAttribute := crawler.GetPRLables(pr.URL)
+			prList[index].Labels = append(prList[index].Labels, prWithAttribute.Labels...)
+			prList[index].Kind = prWithAttribute.Kind
+		}
+		prs = append(prs, prList...)
+
+		if !shouldStop {
+			nexPage = crawler.GetNextPageLink(nexPage)
+			pageIndex++
+		}
 	}
 
 	// 分析结果
@@ -51,6 +81,7 @@ func main() {
 		default:
 			kindOtherNumber++
 		}
+		fmt.Printf("PR: %s, Kind: %s, Merged At: %s\n", pr.URL, pr.Kind, pr.MergeTime)
 	}
 
 	fmt.Printf("Finally Got %d PRs.\n", len(prs))
@@ -59,8 +90,4 @@ func main() {
 	fmt.Println("kindbugNum: ", kindbugNum)
 	fmt.Println("kindfeatureNumber: ", kindfeatureNumber)
 	fmt.Println("kindOtherNumber: ", kindOtherNumber)
-
-	// 获取下一页链接
-	nextPageLink := crawler.GetNextPageLink(KubernetesMasterCommitPage)
-	fmt.Printf("Next page: %s\n", nextPageLink) // 暂时不考虑处理下一页
 }
