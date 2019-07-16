@@ -64,6 +64,11 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 			return
 		}
 
+		if strings.Contains(link, "https://github.com/kubernetes/kubernetes/issues") {
+			fmt.Printf("Found issue from page: %s, ignored here, but should be fix it in future. issue: %s\n", targetPage, link)
+			return
+		}
+
 		timeStr, exist := e.DOM.Find("relative-time[datetime]").Attr("datetime")
 		timeStamp, err := time.Parse(time.RFC3339, timeStr)
 		if err != nil {
@@ -77,6 +82,8 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 		}
 
 		prForPage = append(prForPage, newItem)
+
+		fmt.Printf("Found PR: %s, Merged At: %s\n", newItem.URL, newItem.MergeTime.Local().String())
 
 		//fmt.Printf("%s\n", link)
 		//fmt.Printf("%s\n", timeStr)

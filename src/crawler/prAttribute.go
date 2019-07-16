@@ -43,8 +43,8 @@ func GetPRLables(targetPage string) common.PullRequestItem {
 
 			if strings.Contains(label, "kind/") && PullRequest.Kind == "" { // PR可能会有多个kind，第一个kind做为PR类型标识
 				PullRequest.Kind = label
+				fmt.Printf("PR: %s, type: %s\n", PullRequest.URL, PullRequest.Kind)
 			}
-			//fmt.Printf("PullRequestItem: %s, lable : %s\n", PullRequest.URL, e.Attr("data-name"))
 		}
 	})
 

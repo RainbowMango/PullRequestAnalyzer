@@ -21,8 +21,10 @@ const (
 func main() {
 
 	// 获取指定日期区间的PR数据, [startDate, endDate)
-	startDate := time.Date(2019, time.July, 8, 0, 0, 0, 0, time.UTC)
-	endDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
+	//startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
+	//endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.UTC)
+	startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.Local)
+	endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.Local)
 
 	// 循环获取数据
 	nexPage := KubernetesMasterCommitPage
@@ -36,7 +38,7 @@ func main() {
 		for index, pr := range prList {
 			// 如果PR合入时间早于指定时间，则退出循环
 			if pr.MergeTime.Before(startDate){
-				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.String(), startDate.String())
+				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.Local().String(), startDate.String())
 				shouldStop = true
 				break
 			}
@@ -52,8 +54,10 @@ func main() {
 			prWithAttribute := crawler.GetPRLables(pr.URL)
 			prList[index].Labels = append(prList[index].Labels, prWithAttribute.Labels...)
 			prList[index].Kind = prWithAttribute.Kind
+
+			// 将该PR追加到全局列表中
+			prs = append(prs, prList[index])
 		}
-		prs = append(prs, prList...)
 
 		if !shouldStop {
 			nexPage = crawler.GetNextPageLink(nexPage)
@@ -81,7 +85,7 @@ func main() {
 		default:
 			kindOtherNumber++
 		}
-		fmt.Printf("PR: %s, Kind: %s, Merged At: %s\n", pr.URL, pr.Kind, pr.MergeTime)
+		fmt.Printf("PR: %s, Kind: %s, Merged At: %s\n", pr.URL, pr.Kind, pr.MergeTime.Local().String())
 	}
 
 	fmt.Printf("Finally Got %d PRs.\n", len(prs))

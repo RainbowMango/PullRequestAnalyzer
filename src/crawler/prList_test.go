@@ -8,7 +8,7 @@ import (
 func TestCrawlPrListFromPageExperiment(t *testing.T) {
 	page := "https://github.com/kubernetes/kubernetes/commits/master"
 
-	PullRequests := CrawlPrListFromPageExperiment(page)
+	PullRequests := CrawlPrListFromPage(page)
 	if len(PullRequests) == 0 {
 		t.Errorf("No pull request found in page: %s\n", page)
 		return
