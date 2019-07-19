@@ -14,7 +14,9 @@ import (
 <div class="table-list-cell">
 
   <p class="commit-title h5 mb-1 text-gray-dark ">
-      <a aria-label="Merge pull request #80151 from nikhita/rules-cleanup publishing: bump go versions for 1.13 and 1.14" class="message js-navigation-open" data-pjax="true" href="/kubernetes/kubernetes/commit/c6eb9a8ed51f5c63cb351e2a4c13494bf5c303a2">Merge pull request</a>
+      <a aria-label="Merge pull request #80151 from nikhita/rules-cleanup publishing: bump go versions for 1.13 and 1.14" class="message js-navigation-open" data-pjax="true" href="/kubernetes/kubernetes/commit/c6eb9a8ed51f5c63cb351e2a4c13494bf5c303a2">
+			Merge pull request
+      </a>
       <a class="issue-link js-issue-link"
          data-error-text="Failed to load issue title" data-id="467922764"
          data-permission-text="Issue title is private"
@@ -69,6 +71,13 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 			return
 		}
 
+		// 必须含有"Merge pull request"字样才可以。有时PR-A没被认可，PR-B基于PR-A开发，最终被合入的话，PR-A和PR-B都会出现在提交历史中，PR-A的合入时间会干扰判断，属于垃圾数据，需要排除
+		if !strings.Contains(e.Text, "Merge pull request") {
+			fmt.Printf("Ignored PR(%s), as not merged by robot directly.\n", link)
+			return
+		}
+
+
 		timeStr, exist := e.DOM.Find("relative-time[datetime]").Attr("datetime")
 		timeStamp, err := time.Parse(time.RFC3339, timeStr)
 		if err != nil {
@@ -84,9 +93,6 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 		prForPage = append(prForPage, newItem)
 
 		fmt.Printf("Found PR: %s, Merged At: %s\n", newItem.URL, newItem.MergeTime.Local().String())
-
-		//fmt.Printf("%s\n", link)
-		//fmt.Printf("%s\n", timeStr)
 	})
 
 	c.OnRequest(func(r *colly.Request) {

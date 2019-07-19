@@ -23,8 +23,8 @@ func main() {
 	// 获取指定日期区间的PR数据, (startDate, endDate)
 	//startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
 	//endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.UTC)
-	startDate := time.Date(2019, time.July, 17, 0, 0, 0, 1, time.Local)
-	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.Local)
+	startDate := time.Date(2019, time.July, 15, 0, 0, 1, 0, time.UTC)
+	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.UTC)
 
 	// 循环获取数据
 	nexPage := KubernetesMasterCommitPage
@@ -38,13 +38,14 @@ func main() {
 		for index, pr := range prList {
 			// 如果PR合入时间早于指定时间，则退出循环
 			if pr.MergeTime.Before(startDate) {
-				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.Local().String(), startDate.String())
+				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.String(), startDate.String())
 				shouldStop = true
 				break
 			}
 
 			// 因为是从前往后查找，前面的可能不在统计区间内，所以前面的只需要忽略，不需要退出
 			if pr.MergeTime.After(endDate) {
+				fmt.Printf("Ignored PR (merged at %s) before we expected.\n", pr.MergeTime.Local().String())
 				continue
 			}
 
