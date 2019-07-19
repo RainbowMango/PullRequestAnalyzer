@@ -12,32 +12,32 @@ var prs []common.PullRequestItem
 const KubernetesMasterCommitPage = "https://github.com/kubernetes/kubernetes/commits/master"
 
 const (
-	KindcleanupLable = "kind/cleanup"
+	KindcleanupLable   = "kind/cleanup"
 	KindapichangeLable = "kind/api-change"
-	KindbugLable = "kind/bug"
-	Kindfeature = "kind/feature"
+	KindbugLable       = "kind/bug"
+	Kindfeature        = "kind/feature"
 )
 
 func main() {
 
-	// 获取指定日期区间的PR数据, [startDate, endDate)
+	// 获取指定日期区间的PR数据, (startDate, endDate)
 	//startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
 	//endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.UTC)
-	startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.Local)
-	endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.Local)
+	startDate := time.Date(2019, time.July, 17, 0, 0, 0, 1, time.Local)
+	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.Local)
 
 	// 循环获取数据
 	nexPage := KubernetesMasterCommitPage
 	pageIndex := 0
 	shouldStop := false
-	for !shouldStop{
+	for !shouldStop {
 		fmt.Printf("Get PR from page : %s, index: %d\n", nexPage, pageIndex)
 		prList := crawler.CrawlPrListFromPage(nexPage) // 此时pr拥有 pr.URL, pr.MergeTime
 
 		// 向本页中获取的Pr 列表中填充数据
 		for index, pr := range prList {
 			// 如果PR合入时间早于指定时间，则退出循环
-			if pr.MergeTime.Before(startDate){
+			if pr.MergeTime.Before(startDate) {
 				fmt.Printf("Found PR(%s) merged at %s, before merge time:%s\n", pr.URL, pr.MergeTime.Local().String(), startDate.String())
 				shouldStop = true
 				break
