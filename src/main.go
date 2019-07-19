@@ -21,8 +21,6 @@ const (
 func main() {
 
 	// 获取指定日期区间的PR数据, (startDate, endDate)
-	//startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.UTC)
-	//endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.UTC)
 	startDate := time.Date(2019, time.July, 15, 0, 0, 1, 0, time.Local).UTC()
 	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.Local).UTC()
 

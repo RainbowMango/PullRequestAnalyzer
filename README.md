@@ -1,12 +1,15 @@
 #Install
+需要安装`github.com/gocolly/colly`及其依赖
 
 # Run
 ## 1. 设置PR合入的时间
 main.go中手动修改
 ```
-	startDate := time.Date(2019, time.July, 15, 0, 0, 0, 0, time.Local)
-	endDate := time.Date(2019, time.July, 16, 0, 0, 0, 0, time.Local)
+	// 获取指定日期区间的PR数据, (startDate, endDate)
+	startDate := time.Date(2019, time.July, 15, 0, 0, 1, 0, time.Local).UTC()
+	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.Local).UTC()
 ```
+这里设置时间使用本地时间方便设置，由于网页中获取的时间为UTC，所以本处设置的本地时间也会转成UTC时间。
 
 TODO: 后续可以考虑使用参数传递
 
