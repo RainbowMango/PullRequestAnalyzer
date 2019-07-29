@@ -21,8 +21,8 @@ const (
 func main() {
 
 	// 获取指定日期区间的PR数据, (startDate, endDate)
-	startDate := time.Date(2019, time.July, 15, 0, 0, 1, 0, time.Local).UTC()
-	endDate := time.Date(2019, time.July, 18, 23, 59, 59, 0, time.Local).UTC()
+	startDate := time.Date(2019, time.July, 22, 0, 0, 1, 0, time.Local).UTC()
+	endDate := time.Date(2019, time.July, 28, 23, 59, 59, 0, time.Local).UTC()
 
 	// 循环获取数据
 	nexPage := KubernetesMasterCommitPage
@@ -53,6 +53,7 @@ func main() {
 			prWithAttribute := crawler.GetPRLables(pr.URL)
 			prList[index].Labels = append(prList[index].Labels, prWithAttribute.Labels...)
 			prList[index].Kind = prWithAttribute.Kind
+			prList[index].Title = prWithAttribute.Title
 
 			// 将该PR追加到全局列表中
 			prs = append(prs, prList[index])
@@ -84,7 +85,7 @@ func main() {
 		default:
 			kindOtherNumber++
 		}
-		fmt.Printf("PR: %s, Kind: %s, Merged At: %s\n", pr.URL, pr.Kind, pr.MergeTime.Local().String())
+		fmt.Printf("PR: %s , Kind: %s, Merged At: %s, Title: %s\n", pr.URL, pr.Kind, pr.MergeTime.Local().String(), pr.Title)
 	}
 
 	fmt.Printf("Finally Got %d PRs.\n", len(prs))

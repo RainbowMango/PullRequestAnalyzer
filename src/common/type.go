@@ -3,9 +3,9 @@ package common
 import "time"
 
 type PullRequestItem struct {
-	URL    string
-	Labels []string
-	Kind   string
+	URL       string
+	Title     string
+	Labels    []string
+	Kind      string
 	MergeTime time.Time
 }
-

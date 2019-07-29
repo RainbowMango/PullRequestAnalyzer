@@ -29,7 +29,7 @@ func GetPRLables(targetPage string) common.PullRequestItem {
 		</div>
 	*/
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		if !strings.Contains(e.Attr("class"), "sidebar-labels-style") {  // 必须是边栏的label
+		if !strings.Contains(e.Attr("class"), "sidebar-labels-style") { // 必须是边栏的label
 			return
 		}
 
@@ -48,6 +48,20 @@ func GetPRLables(targetPage string) common.PullRequestItem {
 		}
 	})
 
+	// 获取PR标题
+	/*
+	  <h1 class="gh-header-title">
+	    <span class="js-issue-title">
+	      Kubeadm Networking Configuration E2E Tests
+	    </span>
+	    <span class="gh-header-number">#80259</span>
+	  </h1>
+	*/
+	c.OnHTML("h1[class=gh-header-title]", func(e *colly.HTMLElement) {
+		titleSelection := e.DOM.Find("span[class=js-issue-title]")
+		PullRequest.Title = titleSelection.Text()
+	})
+
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL)
 	})
@@ -59,4 +73,34 @@ func GetPRLables(targetPage string) common.PullRequestItem {
 	c.Visit(targetPage)
 
 	return PullRequest
+}
+
+func GetTitle(targetPage string) string {
+	var title string
+	c := colly.NewCollector()
+
+	/*
+	  <h1 class="gh-header-title">
+	    <span class="js-issue-title">
+	      Kubeadm Networking Configuration E2E Tests
+	    </span>
+	    <span class="gh-header-number">#80259</span>
+	  </h1>
+	*/
+	c.OnHTML("h1[class=gh-header-title]", func(e *colly.HTMLElement) {
+		titleSelection := e.DOM.Find("span[class=js-issue-title]")
+		title = titleSelection.Text() // TODO: 输出没有删除空格
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL)
+	})
+
+	c.OnError(func(_ *colly.Response, e error) {
+		fmt.Println("Something is wrong: ", e)
+	})
+
+	c.Visit(targetPage)
+
+	return title
 }
