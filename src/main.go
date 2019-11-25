@@ -21,8 +21,8 @@ const (
 func main() {
 
 	// 获取指定日期区间的PR数据, (startDate, endDate)
-	startDate := time.Date(2019, time.September, 16, 0, 0, 1, 0, time.Local).UTC()
-	endDate := time.Date(2019, time.September, 22, 23, 59, 59, 0, time.Local).UTC()
+	startDate := time.Date(2019, time.November, 18, 0, 0, 1, 0, time.Local).UTC()
+	endDate := time.Date(2019, time.November, 24, 23, 59, 59, 0, time.Local).UTC()
 
 	// 循环获取数据
 	nexPage := KubernetesMasterCommitPage
