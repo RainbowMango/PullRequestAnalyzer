@@ -1,10 +1,12 @@
 package crawler
 
 import (
-	"common"
 	"fmt"
-	"github.com/gocolly/colly"
 	"strings"
+
+	"github.com/gocolly/colly"
+
+	"common"
 )
 
 // 获取PR的属性
@@ -70,7 +72,7 @@ func GetPRLables(targetPage string) common.PullRequestItem {
 		fmt.Println("Something is wrong: ", e)
 	})
 
-	c.Visit(targetPage)
+	_ = c.Visit(targetPage)
 
 	return PullRequest
 }
@@ -100,7 +102,7 @@ func GetTitle(targetPage string) string {
 		fmt.Println("Something is wrong: ", e)
 	})
 
-	c.Visit(targetPage)
+	_ = c.Visit(targetPage)
 
 	return title
 }
