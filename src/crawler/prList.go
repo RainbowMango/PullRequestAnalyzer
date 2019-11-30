@@ -1,11 +1,13 @@
 package crawler
 
 import (
-	"common"
 	"fmt"
-	"github.com/gocolly/colly"
 	"strings"
 	"time"
+
+	"github.com/gocolly/colly"
+
+	"common"
 )
 
 // CrawlPrListFromPage 将抓取指定页面的PR列表。
@@ -54,7 +56,7 @@ import (
   <div class="commit-desc"><pre class="text-small">publishing: bump go versions for 1.13 and 1.14</pre>
   </div>
 </div>
- */
+*/
 func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 
 	var prForPage []common.PullRequestItem
@@ -77,16 +79,15 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 			return
 		}
 
-
 		timeStr, exist := e.DOM.Find("relative-time[datetime]").Attr("datetime")
 		timeStamp, err := time.Parse(time.RFC3339, timeStr)
 		if err != nil {
-			fmt.Errorf("Trans pr commit time to timestamp failed. timestr: %s\n", timeStr)
+			fmt.Printf("Trans pr commit time to timestamp failed. timestr: %s\n", timeStr)
 			return
 		}
 
 		newItem := common.PullRequestItem{
-			URL: link,
+			URL:       link,
 			MergeTime: timeStamp,
 		}
 
@@ -103,7 +104,7 @@ func CrawlPrListFromPage(targetPage string) []common.PullRequestItem {
 		fmt.Println("Something is wrong: ", e)
 	})
 
-	c.Visit(targetPage)
+	_ = c.Visit(targetPage)
 
 	return prForPage
 }
@@ -118,7 +119,7 @@ func GetNextPageLink(targetPage string) string {
 	*/
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
 
-		if !strings.Contains(e.Attr("class"), "btn") {  // 必须是个按钮
+		if !strings.Contains(e.Attr("class"), "btn") { // 必须是个按钮
 			return
 		}
 
@@ -137,7 +138,7 @@ func GetNextPageLink(targetPage string) string {
 		fmt.Println("Something is wrong: ", e)
 	})
 
-	c.Visit(targetPage)
+	_ = c.Visit(targetPage)
 
 	return nextPage
 }
